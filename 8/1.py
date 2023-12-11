@@ -11,10 +11,10 @@ for line in mappings:
 
 d = dict(zip(keys, values))
 
-cur_pos = keys[0]
+cur_pos = 'AAA'
 steps = 0
 nr_inst = len(instructions)
-while cur_pos != keys[-1]:
+while cur_pos != 'ZZZ':
     inst_ind = steps % nr_inst
     cur_inst = instructions[inst_ind]
     cur_pos = d[cur_pos][0] if cur_inst == 'L' else d[cur_pos][1] 
