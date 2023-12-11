@@ -37,6 +37,7 @@ for part2 in [False, True]:
             if summed == 0:
                 # this means that the last element is 0:
                 # now we need to check for the first element
+                # (and for every other for that matter but i am not doing that)
                 check_first = reduce(lambda acum,x: acum+x[0]*x[1],zip(triangle_altering, line), 0)
                 if check_first:
                     continue
