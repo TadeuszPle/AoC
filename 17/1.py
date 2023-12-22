@@ -46,6 +46,7 @@ def dijkstra(grid: List[List[int]], start: Tuple[int,int], destination: Tuple[in
                 heapq.heappush(q, (cur_wieght + grid[neighb[0]][neighb[1]], neighb,cur_dir))
     return 'not_found', weights
 start = (0,0)
+
 dest = (len(data)-1, len(data[len(data)-1])-1)
 # dest = (2,6)
 print(dest)
