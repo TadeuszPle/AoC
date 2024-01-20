@@ -36,48 +36,36 @@ def part1(start: Tuple[Tuple[int, int], str], grid):
     q: List[Tuple[Tuple[int, int], str]] = []
     q.append(start)
     while q:
-        (y, x), direction = q.pop()
+        (y, x), cur_dir = q.pop()
         
         if not (len(grid) > y >= 0) or not (len(grid[y]) > x >= 0):
             continue
         cur_point = grid[y][x]
         # print((y, x), direction, cur_point)
         if visited[y][x]:
-            if direction in loop_check[y][x]:
+            if cur_dir in loop_check[y][x]:
                 continue
         else:
             visited[y][x] = True
-            loop_check[y][x].append(direction)
-        if cur_point == '.':
-            new_dir = direction
-        elif cur_point == '/':
-            new_dir = forward_slash[direction]
+            loop_check[y][x].append(cur_dir)
+        if cur_point == '/':
+            new_dir = forward_slash[cur_dir]
         elif cur_point == '\\':
-            new_dir = back_slash[direction]
-        elif cur_point == '|':
-            if (direction == 'E' or direction == 'W'):
-                dy, dx = directions['S']
-                new_point = (y+dy, x + dx)
-                q.append((new_point, 'S'))
-                dy, dx = directions['N']
-                new_point = (y+dy, x + dx)
-                q.append((new_point, 'N'))
-                continue
-            else:
-                new_dir = direction
-        elif cur_point == '-':
-            if (direction == 'S' or direction == 'N'):
-                dy, dx = directions['E']
-                new_point = (y+dy, x + dx)
-                q.append((new_point, 'E'))
-                dy, dx = directions['W']
-                new_point = (y+dy, x + dx)
-                q.append((new_point, 'W'))
-                continue
-            else:
-                new_dir = direction
+            new_dir = back_slash[cur_dir]
+        elif cur_point == '|' and (cur_dir == 'E' or cur_dir == 'W'):
+            dy, dx = directions['S']
+            new_point = (y+dy, x+dx)
+            q.append((new_point, 'S'))
+            new_dir = 'N'
+        elif cur_point == '-' and (cur_dir == 'S' or cur_dir == 'N'):
+            dy, dx = directions['E']
+            new_point = (y+dy, x+dx)
+            q.append((new_point, 'E'))
+            new_dir = 'W'
+        else:
+            new_dir = cur_dir
         dy, dx = directions[new_dir]
-        new_point = (y+dy, x + dx)
+        new_point = (y+dy, x+dx)
         q.append((new_point, new_dir))
     
     return sum([sum(row) for row in visited])
