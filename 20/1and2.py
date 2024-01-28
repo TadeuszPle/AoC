@@ -1,6 +1,7 @@
 import sys
-from queue import Queue
-
+import math
+# part 2 inspired thanks to HyperNeutrino 
+# https://www.youtube.com/watch?v=lxm6i21O83k
 def process_file_data(data: list[str]):
     flip_flops: dict[str, tuple[bool, list[str]]] = {}
     conjunctions: dict[str,Conjunction] = {}
@@ -62,8 +63,7 @@ if __name__ == "__main__":
     # print(button, switches, cs)
     def part1(rep: int):
         highs, lows = 0,rep
-        rx = None
-        for iter in range(rep):
+        for _ in range(rep):
             q: list[tuple[bool, str, str]] = [b for b in button]
             while q:
                 signal, prev, cur = q.pop(0)
@@ -71,8 +71,26 @@ if __name__ == "__main__":
                     highs += 1
                 else:
                     lows += 1
+                
+        return highs, lows
+    def part2():
+        # assert only one rx output
+        (last_c, )=[name for name, c in cs.items() if 'rx' in c.outputs]
+        
+        cycles = {name: None for name, c in cs.items() if last_c in c.outputs}
+        presses = 0
+        while True:
+            presses += 1
+            q: list[tuple[bool, str, str]] = [b for b in button]
+            while q:
+                signal, prev, cur = q.pop(0)
+                if cur == last_c and signal:
+                    if not cycles[prev]:
+                        cycles[prev] = presses
+                    else:
+                        assert not presses // cycles
                 if cur in switches:
-                    # this is just nand
+                # this is just nand
                     if signal:
                         continue
                     outs = switches[cur][1]
@@ -83,9 +101,14 @@ if __name__ == "__main__":
                     new_signal = cs[cur].process_input(prev, signal)
                     for out in cs[cur].outputs:
                         q.append((new_signal,cur, out))
-        return highs, lows
-    highs, lows = part1(repeats)
-    output = lows*highs
-    print(f"highs: {highs}, lows: {lows}, mult: {output}")
+                if all(cycles.values()):
+                    out = 1
+                    for val in cycles.values():
+                        out = math.lcm(val, out)
+                    return out
 
-    # 10 000 000 is too low LOL
+    #highs, lows = part1(repeats)
+    
+    output = part2()
+    print(output)
+    #print(f"highs: {highs}, lows: {lows}, mult: {output}")
