@@ -49,10 +49,6 @@ def test1():
     inv = Conjunction('a', ['b'])
     inv.add('i')
     inv.add('b')
-    print(inv.process_input('i', True))
-    print(inv.process_input('b', True))
-    print(inv.process_input('i', False))
-    print(inv.process_input('i', True))   
 # probably could speed up entire rocess if 
 # i could jsut rememmber what state i am after a step 
 # and if happen to go to a step that i know then just
@@ -65,42 +61,31 @@ if __name__ == "__main__":
     button, switches, cs = process_file_data(_data)
     # print(button, switches, cs)
     def part1(rep: int):
-        highs, lows = 0,0
+        highs, lows = 0,rep
+        rx = None
         for iter in range(rep):
-            q: Queue[tuple[bool, str, str]] = Queue()
-            for b in button:
-                q.put(b)
-            cur_highs, cur_lows = 0,len(button)+1
-            while not q.empty():
-                signal, prev, cur = q.get(block=False)
+            q: list[tuple[bool, str, str]] = [b for b in button]
+            while q:
+                signal, prev, cur = q.pop(0)
+                if signal:
+                    highs += 1
+                else:
+                    lows += 1
                 if cur in switches:
-                    # this is just exclusive or 
+                    # this is just nand
                     if signal:
                         continue
                     outs = switches[cur][1]
                     switches[cur] = (not switches[cur][0], outs)
                     for out in outs:
-                        q.put((switches[cur][0],cur, out)) 
-                    if switches[cur][0]:
-                        cur_highs += len(outs)
-                    else:
-                        cur_lows += len(outs)
+                        q.append((switches[cur][0],cur, out)) 
                 elif cur in cs:
                     new_signal = cs[cur].process_input(prev, signal)
                     for out in cs[cur].outputs:
-                        q.put((new_signal,cur, out))
-                    if new_signal:
-                        cur_highs += len(cs[cur].outputs)
-                    else:
-                        cur_lows += len(cs[cur].outputs)
-                else:
-                    rx = signal
-                q.task_done()
-            highs += cur_highs
-            lows += cur_lows
-            if not rx:
-                print(iter)
+                        q.append((new_signal,cur, out))
         return highs, lows
     highs, lows = part1(repeats)
     output = lows*highs
     print(f"highs: {highs}, lows: {lows}, mult: {output}")
+
+    # 10 000 000 is too low LOL
